@@ -1,0 +1,140 @@
+﻿#include "pch-c.h"
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
+
+
+#include "codegen/il2cpp-codegen-metadata.h"
+
+
+
+
+
+extern void FijadorTornillo_AlternarFijacion_mF3C98019D4EB2053FC3869E0CAA390E5E8FDFBEA (void);
+extern void FijadorTornillo_AjustarAnguloConSlider_m82E775EA8645FBFEC920259E52C708A4E92E4398 (void);
+extern void FijadorTornillo__ctor_m9E28B916F43C285976BF793084EFD9DDDA7FD95C (void);
+extern void GeneradorTornillos_Generar_mAA9541546C5064EC627E91D9F55CE02174D75F28 (void);
+extern void GeneradorTornillos__ctor_m07287D39058B7B53A9F3AEE48244006A18C2529F (void);
+extern void GeneradorTriangulo_GenerarSuperiores_m51F2598A3631A2E04EC091ADD71E7FE8FA576DED (void);
+extern void GeneradorTriangulo_ApagarAgarre_mAF3F3644B49768C90E8A6984C9179F7977BA337C (void);
+extern void GeneradorTriangulo__ctor_m08A42BD2BD16FC77A9004473A43C70A97091C61E (void);
+extern void GestionHueso_Start_m475DCCDAA3AF2F8C8678626D8B0B80AE5BDD560F (void);
+extern void GestionHueso_AlternarBloqueo_m126C032AC370D3BF0464585F37EF209A592063F9 (void);
+extern void GestionHueso__ctor_m059BD266030FF64D3855AD6FD29A9725D6AE1EA7 (void);
+extern void PosicionarInicio_Start_m59295C2DAF91CD490DB60A28E72FA680CB2FD21A (void);
+extern void PosicionarInicio_ApagarSeguimiento_m5A8FFE0105C9595DC185ABFB756ECAED289D394A (void);
+extern void PosicionarInicio__ctor_m96F613DE41FF643BADDE6E3390DE83D67184EAB2 (void);
+extern void U3CApagarSeguimientoU3Ed__2__ctor_m629DDBC6BCF1EC1AAA910603C5FE2E2616232648 (void);
+extern void U3CApagarSeguimientoU3Ed__2_System_IDisposable_Dispose_mA1911B12ACF4562DF247CD8B64ADCEE1E4B126DD (void);
+extern void U3CApagarSeguimientoU3Ed__2_MoveNext_m52684DEC32F1B07BD1752E2CD5FF42AFCE9FBBB9 (void);
+extern void U3CApagarSeguimientoU3Ed__2_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m5770EC20DB823AD39AA9D7BE0FEC4DBA48E991B7 (void);
+extern void U3CApagarSeguimientoU3Ed__2_System_Collections_IEnumerator_Reset_mA0F1B09DB74B9902E0AEAC13B55DDCE9E4913148 (void);
+extern void U3CApagarSeguimientoU3Ed__2_System_Collections_IEnumerator_get_Current_m73CD3A6552FC4188D04531015F975D5B2CFCDA02 (void);
+extern void ReiniciarSistema_BotonReinicioTotal_m04E17A20C264D6F2FD1CC6781DEAEC419A98FC78 (void);
+extern void ReiniciarSistema__ctor_m48E217CAE038AE3D7788ADEAD48D446A2BD35754 (void);
+extern void RestaurarEscala_Start_mA9A20EE708946E251A6BE2ABE8D7F5D8CD2A4623 (void);
+extern void RestaurarEscala_Resetear_m1E1ECE11EF590224E030A6932CCA83E9A9B742C4 (void);
+extern void RestaurarEscala__ctor_m7D283C4AE14B1FB569A39941A430B75D885BBA60 (void);
+extern void SelectorPunto_OnTouchStarted_m0D1F1AD10C163E4D725C729E44A555EFF52EABA6 (void);
+extern void SelectorPunto_OnTouchCompleted_m16238CE41E583656EF86C558B481E53F365C47F8 (void);
+extern void SelectorPunto_OnTouchUpdated_m5E005F6BD0E25831CEFA2882EC2B196AD78856FD (void);
+extern void SelectorPunto__ctor_mD00CB854AB603115F63037D4267E4CF7DC82219F (void);
+extern void VuforiaLicense_GetLicenseKey_m796D51E5EF1C53F3D62BA4EA8806AC1FB1A5E3C4 (void);
+extern void VuforiaLicense__ctor_m094B92B3323DFFD79ADB696474D5D158C95E291B (void);
+extern void UnitySourceGeneratedAssemblyMonoScriptTypes_v1_Get_mBEB95BEB954BB63E9710BBC7AD5E78C4CB0A0033 (void);
+extern void UnitySourceGeneratedAssemblyMonoScriptTypes_v1__ctor_mE70FB23ACC1EA12ABC948AA22C2E78B2D0AA39B1 (void);
+static Il2CppMethodPointer s_methodPointers[33] = 
+{
+	FijadorTornillo_AlternarFijacion_mF3C98019D4EB2053FC3869E0CAA390E5E8FDFBEA,
+	FijadorTornillo_AjustarAnguloConSlider_m82E775EA8645FBFEC920259E52C708A4E92E4398,
+	FijadorTornillo__ctor_m9E28B916F43C285976BF793084EFD9DDDA7FD95C,
+	GeneradorTornillos_Generar_mAA9541546C5064EC627E91D9F55CE02174D75F28,
+	GeneradorTornillos__ctor_m07287D39058B7B53A9F3AEE48244006A18C2529F,
+	GeneradorTriangulo_GenerarSuperiores_m51F2598A3631A2E04EC091ADD71E7FE8FA576DED,
+	GeneradorTriangulo_ApagarAgarre_mAF3F3644B49768C90E8A6984C9179F7977BA337C,
+	GeneradorTriangulo__ctor_m08A42BD2BD16FC77A9004473A43C70A97091C61E,
+	GestionHueso_Start_m475DCCDAA3AF2F8C8678626D8B0B80AE5BDD560F,
+	GestionHueso_AlternarBloqueo_m126C032AC370D3BF0464585F37EF209A592063F9,
+	GestionHueso__ctor_m059BD266030FF64D3855AD6FD29A9725D6AE1EA7,
+	PosicionarInicio_Start_m59295C2DAF91CD490DB60A28E72FA680CB2FD21A,
+	PosicionarInicio_ApagarSeguimiento_m5A8FFE0105C9595DC185ABFB756ECAED289D394A,
+	PosicionarInicio__ctor_m96F613DE41FF643BADDE6E3390DE83D67184EAB2,
+	U3CApagarSeguimientoU3Ed__2__ctor_m629DDBC6BCF1EC1AAA910603C5FE2E2616232648,
+	U3CApagarSeguimientoU3Ed__2_System_IDisposable_Dispose_mA1911B12ACF4562DF247CD8B64ADCEE1E4B126DD,
+	U3CApagarSeguimientoU3Ed__2_MoveNext_m52684DEC32F1B07BD1752E2CD5FF42AFCE9FBBB9,
+	U3CApagarSeguimientoU3Ed__2_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_m5770EC20DB823AD39AA9D7BE0FEC4DBA48E991B7,
+	U3CApagarSeguimientoU3Ed__2_System_Collections_IEnumerator_Reset_mA0F1B09DB74B9902E0AEAC13B55DDCE9E4913148,
+	U3CApagarSeguimientoU3Ed__2_System_Collections_IEnumerator_get_Current_m73CD3A6552FC4188D04531015F975D5B2CFCDA02,
+	ReiniciarSistema_BotonReinicioTotal_m04E17A20C264D6F2FD1CC6781DEAEC419A98FC78,
+	ReiniciarSistema__ctor_m48E217CAE038AE3D7788ADEAD48D446A2BD35754,
+	RestaurarEscala_Start_mA9A20EE708946E251A6BE2ABE8D7F5D8CD2A4623,
+	RestaurarEscala_Resetear_m1E1ECE11EF590224E030A6932CCA83E9A9B742C4,
+	RestaurarEscala__ctor_m7D283C4AE14B1FB569A39941A430B75D885BBA60,
+	SelectorPunto_OnTouchStarted_m0D1F1AD10C163E4D725C729E44A555EFF52EABA6,
+	SelectorPunto_OnTouchCompleted_m16238CE41E583656EF86C558B481E53F365C47F8,
+	SelectorPunto_OnTouchUpdated_m5E005F6BD0E25831CEFA2882EC2B196AD78856FD,
+	SelectorPunto__ctor_mD00CB854AB603115F63037D4267E4CF7DC82219F,
+	VuforiaLicense_GetLicenseKey_m796D51E5EF1C53F3D62BA4EA8806AC1FB1A5E3C4,
+	VuforiaLicense__ctor_m094B92B3323DFFD79ADB696474D5D158C95E291B,
+	UnitySourceGeneratedAssemblyMonoScriptTypes_v1_Get_mBEB95BEB954BB63E9710BBC7AD5E78C4CB0A0033,
+	UnitySourceGeneratedAssemblyMonoScriptTypes_v1__ctor_mE70FB23ACC1EA12ABC948AA22C2E78B2D0AA39B1,
+};
+static const int32_t s_InvokerIndices[33] = 
+{
+	10494,
+	8261,
+	10494,
+	10494,
+	10494,
+	10494,
+	8261,
+	10494,
+	10494,
+	10494,
+	10494,
+	10494,
+	10322,
+	10494,
+	8207,
+	10494,
+	10163,
+	10322,
+	10494,
+	10322,
+	10494,
+	10494,
+	10494,
+	10494,
+	10494,
+	8261,
+	8261,
+	8261,
+	10494,
+	15308,
+	10494,
+	15397,
+	10494,
+};
+IL2CPP_EXTERN_C const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule;
+const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule = 
+{
+	"Assembly-CSharp.dll",
+	33,
+	s_methodPointers,
+	0,
+	NULL,
+	s_InvokerIndices,
+	0,
+	NULL,
+	0,
+	NULL,
+	0,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+};

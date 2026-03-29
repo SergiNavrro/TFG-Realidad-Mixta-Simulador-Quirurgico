@@ -1,0 +1,74 @@
+# =========================
+# Unity generated folders
+# =========================
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+
+# =========================
+# MemoryCaptures
+# =========================
+[Mm]emoryCaptures/
+
+# =========================
+# Asset meta data
+# =========================
+!/[Aa]ssets/**/*.meta
+!/[Pp]ackages/**/*.meta
+!/[Pp]rojectSettings/**/*.meta
+
+# =========================
+# Visual Studio / Rider
+# =========================
+.vs/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+
+# =========================
+# OS generated
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Crash Reports
+# =========================
+sysinfo.txt
+
+# =========================
+# Builds
+# =========================
+*.apk
+*.aab
+*.unitypackage
+
+# =========================
+# JetBrains Rider
+# =========================
+.idea/
+
+# =========================
+# VSCode
+# =========================
+.vscode/
+
+# =========================
+# Git LFS (opcional pero recomendado)
+# =========================
+*.psd
+*.png
+*.jpg
+*.wav
+*.mp4
