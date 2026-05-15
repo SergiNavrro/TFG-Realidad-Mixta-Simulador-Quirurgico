@@ -31,24 +31,34 @@ public class RestaurarEscala : MonoBehaviour
             // 2. Reseteamos el hueso a su tamaño original anatómico
             huesoPadre.localScale = escalaSegura;
 
-            // 3. ¡LA SOLUCIÓN A TU DUDA! Buscamos el tornillo en la escena
-            GameObject tornillo = GameObject.Find("Tornillo_Manual");
+            // Calculamos el factor de proporción una sola vez para usarlo en todos
+            float factorDeProporcion = escalaSegura.x / escalaVieja.x;
 
-            if (tornillo != null)
+            // 3. LA SOLUCIÓN: Lista con los nombres de TODOS los tornillos de la escena
+            string[] nombresTornillos = {
+                "Tornillo_Manual",
+                "Tornillo_Superior_Izquierdo",
+                "Tornillo_Superior_Derecho"
+            };
+
+            // 4. Pasamos por cada tornillo y le aplicamos tu lógica de seguridad
+            foreach (string nombre in nombresTornillos)
             {
-                // Solo tenemos que arreglarlo a mano si NO es hijo del hueso (si está suelto).
-                // Si es hijo, Unity ya lo ha encogido automáticamente en el paso 2.
-                if (tornillo.transform.parent != huesoPadre)
-                {
-                    // Regla de 3: Calculamos la proporción (ej: si pasa de 2 a 1, el factor es 0.5)
-                    float factorDeProporcion = escalaSegura.x / escalaVieja.x;
+                GameObject tornillo = GameObject.Find(nombre);
 
-                    // Aplicamos ese multiplicador al tornillo suelto
-                    tornillo.transform.localScale = tornillo.transform.localScale * factorDeProporcion;
+                if (tornillo != null)
+                {
+                    // Solo tenemos que arreglarlo a mano si NO es hijo del hueso (si está suelto).
+                    // Si es hijo, Unity ya lo ha encogido automáticamente en el paso 2.
+                    if (tornillo.transform.parent != huesoPadre)
+                    {
+                        // Aplicamos ese multiplicador al tornillo suelto
+                        tornillo.transform.localScale = tornillo.transform.localScale * factorDeProporcion;
+                    }
                 }
             }
 
-            Debug.Log("<color=cyan>ESCALA RESETEADA:</color> Hueso y tornillos ajustados a escala proporcional 1:1.");
+            Debug.Log("<color=cyan>ESCALA RESETEADA:</color> Hueso y los TRES tornillos ajustados a escala proporcional.");
         }
     }
 }

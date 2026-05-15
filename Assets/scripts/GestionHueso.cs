@@ -1,62 +1,70 @@
 using UnityEngine;
-// ¡IMPORTANTE! Añadimos esta línea para que Unity reconozca los scripts de MRTK
 using Microsoft.MixedReality.Toolkit.UI;
 
 public class GestionHueso : MonoBehaviour
 {
-    [Header("1. El Padre (Movimiento)")]
-    [Tooltip("Arrastra aquí el objeto PADRE (femur_roto)")]
-    public GameObject femurPadre;
+    [Header("Referencias")]
+    [Tooltip("El manipulador del fémur físico/virtual")]
+    public ObjectManipulator manipuladorHueso;
 
-    [Header("2. Las dos texturas")]
-    public Material texturaNormal;
-    public Material texturaTransparente;
+    [Tooltip("El cerebro del botón de MRTK")]
+    public ButtonConfigHelper configuradorBoton;
 
-    [Header("3. Los Hijos (Visual)")]
-    [Tooltip("Arrastra aquí la cabeza y el cuerpo del fémur")]
-    public Renderer[] mallasHijas;
+    [Header("Efecto Visual de Bloqueo")]
+    [Tooltip("La cabeza del fémur")]
+    public Renderer mallaCabeza;
+    [Tooltip("El cuerpo del fémur")]
+    public Renderer mallaCuerpo;
 
-    // Estado inicial
-    private bool estaDesbloqueado = true;
+    [Tooltip("¡ARRASTRA AQUÍ TU MATERIAL DE BLOQUEO!")]
+    public Material materialBloqueado;
 
-    // Variables internas para guardar los componentes de movimiento
-    private ObjectManipulator manipulador;
+    // Guardamos el estado actual
+    private bool estaBloqueado = false;
+
+    // Variables para memorizar los MATERIALES originales
+    private Material materialOriginalCabeza;
+    private Material materialOriginalCuerpo;
 
     void Start()
     {
-        // Al arrancar, buscamos el componente que permite agarrar el hueso
-        if (femurPadre != null)
-        {
-            manipulador = femurPadre.GetComponent<ObjectManipulator>();
-        }
+        // Guardamos el material que tenga el hueso al empezar
+        if (mallaCabeza != null) materialOriginalCabeza = mallaCabeza.material;
+        if (mallaCuerpo != null) materialOriginalCuerpo = mallaCuerpo.material;
     }
 
     public void AlternarBloqueo()
     {
-        estaDesbloqueado = !estaDesbloqueado;
+        // 1. Invertimos el estado
+        estaBloqueado = !estaBloqueado;
 
-        // 1. APAGAR EL MOVIMIENTO DIRECTAMENTE
-        if (manipulador != null)
+        // 2. Activamos o desactivamos el movimiento
+        if (manipuladorHueso != null)
         {
-            manipulador.enabled = estaDesbloqueado; // Si es falso, ya no se puede agarrar ni escalar
+            manipuladorHueso.enabled = !estaBloqueado;
+        }
+
+        // 3. Cambiamos el texto del botón
+        if (configuradorBoton != null)
+        {
+            if (estaBloqueado)
+                configuradorBoton.MainLabelText = "Desbloquear Fémur";
+            else
+                configuradorBoton.MainLabelText = "Bloquear Fémur";
+        }
+
+        // 4. CAMBIAMOS EL MATERIAL COMPLETO
+        if (estaBloqueado)
+        {
+            // Le ponemos tu material personalizado
+            if (mallaCabeza != null && materialBloqueado != null) mallaCabeza.material = materialBloqueado;
+            if (mallaCuerpo != null && materialBloqueado != null) mallaCuerpo.material = materialBloqueado;
         }
         else
         {
-            Debug.LogWarning("¡Ojo! No se ha encontrado el ObjectManipulator en el fémur padre.");
+            // Le devolvemos su material original (el blanco normal)
+            if (mallaCabeza != null) mallaCabeza.material = materialOriginalCabeza;
+            if (mallaCuerpo != null) mallaCuerpo.material = materialOriginalCuerpo;
         }
-
-        // 2. Elegir qué textura toca
-        Material texturaActual = estaDesbloqueado ? texturaNormal : texturaTransparente;
-
-        // 3. Aplicar la textura a todas las piezas hijas
-        foreach (Renderer malla in mallasHijas)
-        {
-            if (malla != null)
-            {
-                malla.material = texturaActual;
-            }
-        }
-
-        Debug.Log(estaDesbloqueado ? "MODO DESBLOQUEADO: Hueso libre y normal." : "MODO BLOQUEO: Físicas de agarre desactivadas y transparente.");
     }
 }

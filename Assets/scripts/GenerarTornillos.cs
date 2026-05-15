@@ -39,7 +39,15 @@ public class GeneradorTornillos : MonoBehaviour
         // 4. Crear el tornillo con esa posición y rotación
         GameObject nuevoTornillo = Instantiate(prefabTornillo, posicionAparicion, rotacionInicial);
         nuevoTornillo.name = "Tornillo_Manual";
-
+        EvaluadorAngular evaluador = FindObjectOfType<EvaluadorAngular>();
+        if (evaluador != null)
+        {
+            evaluador.AsignarEjeHueso(nuevoTornillo.transform);
+        }
+        else
+        {
+            Debug.LogWarning("No he encontrado el script EvaluadorAngular en la escena.");
+        }
         // 5. Escalar el tornillo proporcionalmente al tamaño actual del hueso padre
         if (huesoPadre != null)
         {
