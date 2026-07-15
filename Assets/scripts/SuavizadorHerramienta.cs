@@ -3,19 +3,17 @@ using Vuforia;
 
 public class SuavizadorHerramienta : MonoBehaviour
 {
-    [Range(1, 20)]
-    public int bufferFrames = 8;
+    [Range(0.05f, 1f)]
+    [Tooltip("Cuánto peso al frame nuevo. Bajo=más suave/lento. Alto=más responsivo/jittery. Recomendado 0.3-0.5")]
+    public float suavizado = 0.4f;
 
-    private Vector3[] bufferPosicion;
-    private Quaternion[] bufferRotacion;
-    private int indice = 0;
-    private bool bufferLleno = false;
+    private Vector3 posSuavizada;
+    private Quaternion rotSuavizada;
+    private bool primeraVez = true;
     private ObserverBehaviour observer;
 
     void Start()
     {
-        bufferPosicion = new Vector3[bufferFrames];
-        bufferRotacion = new Quaternion[bufferFrames];
         observer = GetComponent<ObserverBehaviour>();
     }
 
@@ -23,24 +21,19 @@ public class SuavizadorHerramienta : MonoBehaviour
     {
         if (observer == null || observer.TargetStatus.Status != Status.TRACKED) return;
 
-        bufferPosicion[indice] = transform.position;
-        bufferRotacion[indice] = transform.rotation;
-        indice = (indice + 1) % bufferFrames;
-        if (indice == 0) bufferLleno = true;
+        if (primeraVez)
+        {
+            posSuavizada = transform.position;
+            rotSuavizada = transform.rotation;
+            primeraVez = false;
+            return;
+        }
 
-        int cantidad = bufferLleno ? bufferFrames : indice;
-        if (cantidad == 0) return;
+        // EMA: peso suavizado al nuevo, (1-suavizado) al anterior
+        posSuavizada = Vector3.Lerp(posSuavizada, transform.position, suavizado);
+        rotSuavizada = Quaternion.Slerp(rotSuavizada, transform.rotation, suavizado);
 
-        Vector3 posMedia = Vector3.zero;
-        for (int i = 0; i < cantidad; i++)
-            posMedia += bufferPosicion[i];
-        posMedia /= cantidad;
-
-        Quaternion rotMedia = bufferRotacion[0];
-        for (int i = 1; i < cantidad; i++)
-            rotMedia = Quaternion.Slerp(rotMedia, bufferRotacion[i], 1f / (i + 1));
-
-        transform.position = posMedia;
-        transform.rotation = rotMedia;
+        transform.position = posSuavizada;
+        transform.rotation = rotSuavizada;
     }
 }

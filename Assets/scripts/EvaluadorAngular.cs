@@ -1,5 +1,4 @@
-using TMPro;
-//using UnityEditor.PackageManager;
+ï»¿using TMPro;
 using UnityEngine;
 
 public class EvaluadorAngular : MonoBehaviour
@@ -9,24 +8,40 @@ public class EvaluadorAngular : MonoBehaviour
     public Renderer cilindroHerramientaRenderer;
     public Transform cilindroHerramienta;
 
-    [Header("Hueso (se asigna automáticamente al crear el tornillo)")]
+    [Header("Hueso (se asigna automÃ¡ticamente al crear el tornillo)")]
     private Transform ejeHueso;
-    //public Transform cilindroHueso;
 
     [Header("Feedback Visual")]
     public Material matRojo;
     public Material matVerde;
     public Material matBlanco;
 
-    [Header("Configuración")]
-    public float toleranciaGrados = 3.0f;
-    public float toleranciaPosicionMm = 2.0f;
+    [Header("ConfiguraciÃ³n")]
+    public float toleranciaGrados = 5.0f;
+    public float toleranciaPosicionMm = 3.0f;
     public float frecuenciaEvaluacion = 0.1f;
 
-    [Header("HUD")]
-    //public TextMeshProUGUI textoErrorX;
+    [Header("HUD - Angular")]
+    public TextMeshProUGUI textoErrorAngular;
+
+    [Header("HUD - PosiciÃ³n Lateral")]
+    public TextMeshProUGUI textoErrorX;
     public TextMeshProUGUI textoErrorZ;
-    public TextMeshProUGUI textoErrorPosicion;
+
+    [Header("HUD - Profundidad")]
+    public TextMeshProUGUI textoProfundidad;
+
+    [Header("HUD - Estado General")]
+    public TextMeshProUGUI textoEstado;
+
+    // --- DATOS EXPUESTOS PARA EL REGISTRADOR ---
+    [HideInInspector] public float ultimoErrorAngular = 0f;
+    [HideInInspector] public float ultimoErrorX = 0f;
+    [HideInInspector] public float ultimoErrorZ = 0f;
+    [HideInInspector] public float ultimaProfundidad = 0f;
+    [HideInInspector] public float ultimoPorcentaje = 0f;
+    [HideInInspector] public bool ultimoEstadoOk = false;
+    [HideInInspector] public bool evaluacionActiva => activo;
 
     private bool activo = false;
     private bool estaEnVerde = false;
@@ -42,7 +57,7 @@ public class EvaluadorAngular : MonoBehaviour
     {
         if (ejeHueso == null)
         {
-            Debug.LogWarning("Aún no hay tornillo creado. Crea el tornillo primero.");
+            Debug.LogWarning("AÃºn no hay tornillo creado. Crea el tornillo primero.");
             return;
         }
 
@@ -52,79 +67,86 @@ public class EvaluadorAngular : MonoBehaviour
         {
             AplicarMaterial(matBlanco);
             estaEnVerde = false;
-            //if (textoErrorX != null) textoErrorX.text = "Error X: --";
-            if (textoErrorZ != null) textoErrorZ.text = "Error Z: --";
-            if (textoErrorPosicion != null) textoErrorPosicion.text = "Posición: --";
+            LimpiarHUD();
         }
         else
         {
-            estaEnVerde = true;
             timerEvaluacion = frecuenciaEvaluacion;
         }
     }
 
     void Update()
     {
-        if (!activo || ejeHueso == null || ejeHerramienta == null) return;
+        if (!activo || ejeHueso == null || ejeHerramienta == null || cilindroHerramienta == null) return;
 
-        // Calculamos los puntos base de ambos cilindros
-        Vector3 entradaTornillo = Vector3.zero;
-        Vector3 puntaHerramienta = Vector3.zero;
-        bool puntosValidos = false;
-      
-        if (cilindroHerramienta != null)
-        {
-            float longitudHueso = ejeHueso.lossyScale.y * 2f;
-            float longitudHerramienta = cilindroHerramienta.lossyScale.y * 2f;
+        // --- PUNTOS DE REFERENCIA ---
+        float longitudHueso = ejeHueso.lossyScale.y * 2f;
+        float longitudHerramienta = cilindroHerramienta.lossyScale.y * 2f;
 
-            entradaTornillo = ejeHueso.position - (ejeHueso.up * (longitudHueso / 2f));
-            puntaHerramienta = cilindroHerramienta.position + (cilindroHerramienta.up * (longitudHerramienta / 2f));
+        // Base del tornillo planificado (entrada al hueso, corteza lateral)
+        Vector3 entradaTornillo = ejeHueso.position - (ejeHueso.up * (longitudHueso / 2f));
+        // Punta de la herramienta (up apunta al mango, por eso -)
+        Vector3 puntaHerramienta = cilindroHerramienta.position - (cilindroHerramienta.up * (longitudHerramienta / 2f));
 
-            puntosValidos = true;
-
-            // Debug visual en tiempo real
-            Debug.DrawLine(entradaTornillo, puntaHerramienta, Color.magenta);
-            Debug.DrawRay(entradaTornillo, Vector3.up * 0.01f, Color.blue);
-            Debug.DrawRay(puntaHerramienta, Vector3.up * 0.01f, Color.red);
-        }
+        // Debug visual
+        Debug.DrawLine(entradaTornillo, puntaHerramienta, Color.magenta);
+        Debug.DrawRay(entradaTornillo, Vector3.up * 0.01f, Color.blue);
+        Debug.DrawRay(puntaHerramienta, Vector3.up * 0.01f, Color.red);
 
         timerEvaluacion += Time.deltaTime;
         if (timerEvaluacion < frecuenciaEvaluacion) return;
         timerEvaluacion = 0f;
 
-        // Error angular
-        /*float errorX = Vector3.Angle(
-            ejeHerramienta.TransformDirection(Vector3.right),
-            ejeHueso.TransformDirection(Vector3.right)
-        );
-
-        float errorZ = Vector3.Angle(
-            ejeHerramienta.TransformDirection(Vector3.forward),
-            ejeHueso.TransformDirection(Vector3.forward)
-        );
-        if (textoErrorX != null) textoErrorX.text = $"Error X: {errorX:F1}°";
-        if (textoErrorZ != null) textoErrorZ.text = $"Error Z: {errorZ:F1}°";
-        */
+        // --- ERROR ANGULAR ---
         float errorInclinacion = Vector3.Angle(ejeHerramienta.up, ejeHueso.up);
-        if (textoErrorZ != null) textoErrorZ.text = $"Error Y: {errorInclinacion:F1}°";
-        // Error de posición
-        float errorPosicionMm = 0f;
-        bool posicionOk = false;
 
-        if (puntosValidos)
+        // --- ERRORES DE POSICIÃ“N (en coordenadas locales del tornillo) ---
+        Vector3 diff = puntaHerramienta - entradaTornillo;
+
+        float errorX_mm = Vector3.Dot(diff, ejeHueso.right) * 1000f;
+        float errorZ_mm = Vector3.Dot(diff, ejeHueso.forward) * 1000f;
+        float profundidad_mm = Vector3.Dot(diff, ejeHueso.up) * 1000f;
+
+        // --- PROFUNDIDAD E INSERCIÃ“N ---
+        float longitudHerramienta_mm = longitudHerramienta * 1000f;
+        float porcentajeInsercion = Mathf.Clamp01(profundidad_mm / longitudHerramienta_mm) * 100f;
+
+        
+
+        // --- ACTUALIZAR HUD ---
+        if (textoErrorAngular != null)
+            textoErrorAngular.text = $"Ãngulo: {errorInclinacion:F1}Â°";
+
+        if (textoErrorX != null)
+            textoErrorX.text = $"Error X: {errorX_mm:F1} mm";
+
+        if (textoErrorZ != null)
+            textoErrorZ.text = $"Error Z: {errorZ_mm:F1} mm";
+
+        if (textoProfundidad != null)
         {
-            errorPosicionMm = Vector3.Distance(entradaTornillo, puntaHerramienta) * 1000f;
-            posicionOk = errorPosicionMm <= toleranciaPosicionMm;
-
-            if (textoErrorPosicion != null)
-                textoErrorPosicion.text = $"Posición: {errorPosicionMm:F1} mm";
+            if (profundidad_mm <= 0)
+                textoProfundidad.text = $"Prof: {Mathf.Abs(profundidad_mm):F1} mm (Fuera)";
+            else if (porcentajeInsercion >= 100f)
+                textoProfundidad.text = "âœ“ INSERTADO COMPLETAMENTE";
+            else
+                textoProfundidad.text = $"InserciÃ³n: {porcentajeInsercion:F1}%";
         }
 
-        // Verde solo si ángulo Y posición están dentro de tolerancia
-        //bool deberiaEstarEnVerde = errorX <= toleranciaGrados
-        //&& errorZ <= toleranciaGrados
-        //&& posicionOk;
-        bool deberiaEstarEnVerde = errorInclinacion <= toleranciaGrados && posicionOk;
+        // --- LÃ“GICA VERDE/ROJO ---
+        bool deberiaEstarEnVerde = errorInclinacion <= toleranciaGrados
+                                && Mathf.Abs(errorX_mm) <= toleranciaPosicionMm
+                                && Mathf.Abs(errorZ_mm) <= toleranciaPosicionMm;
+        ultimoErrorAngular = errorInclinacion;
+        ultimoErrorX = errorX_mm;
+        ultimoErrorZ = errorZ_mm;
+        ultimaProfundidad = profundidad_mm;
+        ultimoPorcentaje = porcentajeInsercion;
+        ultimoEstadoOk = deberiaEstarEnVerde;   
+
+        if (textoEstado != null)
+            textoEstado.text = deberiaEstarEnVerde ? "âœ“ ALINEADO" : "âœ— AJUSTAR";
+
         if (deberiaEstarEnVerde != estaEnVerde)
         {
             estaEnVerde = deberiaEstarEnVerde;
@@ -136,5 +158,14 @@ public class EvaluadorAngular : MonoBehaviour
     {
         if (cilindroHerramientaRenderer != null && mat != null)
             cilindroHerramientaRenderer.sharedMaterial = mat;
+    }
+
+    private void LimpiarHUD()
+    {
+        if (textoErrorAngular != null) textoErrorAngular.text = "Ãngulo: --";
+        if (textoErrorX != null) textoErrorX.text = "Error X: --";
+        if (textoErrorZ != null) textoErrorZ.text = "Error Z: --";
+        if (textoProfundidad != null) textoProfundidad.text = "Prof: --";
+        if (textoEstado != null) textoEstado.text = "-- INACTIVO --";
     }
 }

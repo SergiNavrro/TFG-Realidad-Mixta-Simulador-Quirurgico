@@ -31,6 +31,9 @@ public class GeneradorTriangulo : MonoBehaviour
 
     // Añade esto junto a las otras variables privadas
     [HideInInspector] public static float profundidadCalculada = 0f;
+    [HideInInspector] public static float distanciaParedIzq = 0f;
+    [HideInInspector] public static float distanciaParedDer = 0f;
+    [HideInInspector] public static float separacionFinal = 0f;
 
     // Cerrojo de seguridad para evitar bucles infinitos al mover el slider por código
     private bool actualizandoSliderManual = false;
@@ -80,6 +83,7 @@ public class GeneradorTriangulo : MonoBehaviour
 
         // Guardamos esta distancia como el tope máximo inamovible
         limiteSeparacionFijo = distanciaReal / factorDeProporcion;
+        separacionFinal = separacion;
     }
 
     // SLIDER MRTK: Este es el método que tienes que enlazar en el PinchSlider de MRTK
@@ -98,7 +102,7 @@ public class GeneradorTriangulo : MonoBehaviour
             // Si lo está haciendo más pequeño (cerrando el triángulo), le dejamos
             separacion = separacionDeseada;
         }
-
+        separacionFinal = separacion;
         // 3. Movemos los tornillos
         if (tornilloIzqGenerado != null && tornilloDerGenerado != null)
         {
@@ -152,19 +156,29 @@ public class GeneradorTriangulo : MonoBehaviour
                 float tornilloTotalSeguro = distanciaEntrada + longitudAncladaSegura;
                 profundidadCalculada = tornilloTotalSeguro;
 
-                // Añade esto justo debajo:
+                // Añade esto justo debajo: cilindro herramienta
                 if (cilindroHerramienta != null)
                 {
+                    // 1. Guardamos la punta ANTES de escalar
                     float escalaYAnterior = cilindroHerramienta.localScale.y;
-                    float nuevaEscalaY = tornilloTotalSeguro / 2f;
+                    float nuevaEscalaY = (tornilloTotalSeguro / factorEscala) / 2f;
 
-                    Vector3 escala = cilindroHerramienta.localScale;
-                    cilindroHerramienta.localScale = new Vector3(escala.x, nuevaEscalaY, escala.z);
+                    Vector3 puntaAntes = cilindroHerramienta.position -
+                                         (cilindroHerramienta.up * (escalaYAnterior * 2f / 2f));
 
-                    // Compensamos el desplazamiento del pivote
-                    // La diferencia de escala en Y se traduce en desplazamiento en el eje local del cilindro
-                    float diferencia = nuevaEscalaY - escalaYAnterior;
-                    cilindroHerramienta.localPosition -= cilindroHerramienta.up * diferencia;
+                    // 2. Escalamos
+                    cilindroHerramienta.localScale = new Vector3(
+                        cilindroHerramienta.localScale.x,
+                        nuevaEscalaY,
+                        cilindroHerramienta.localScale.z
+                    );
+
+                    // 3. Calculamos dónde ha quedado la punta después
+                    Vector3 puntaDespues = cilindroHerramienta.position -
+                                           (cilindroHerramienta.up * (nuevaEscalaY * 2f / 2f));
+
+                    // 4. Compensamos para que la punta quede fija
+                    cilindroHerramienta.position -= (puntaAntes - puntaDespues);
 
                     Debug.Log($"Cilindro ajustado a: {tornilloTotalSeguro * 1000f:F1} mm");
                 }
@@ -177,21 +191,7 @@ public class GeneradorTriangulo : MonoBehaviour
 
                 // --- NUEVO: REESCALADO DE LA HERRAMIENTA ---
                 // Si hemos enlazado el cilindro de la herramienta en el Inspector, le cambiamos el tamaño
-                if (cilindroHerramienta != null)
-                {
-                    // Dividimos por 2 porque los cilindros de Unity miden 2 metros por defecto
-                    float escalaY = tornilloTotalSeguro / 2f;
-
-                    // Aplicamos la nueva escala manteniendo el grosor original (X y Z)
-                    Vector3 escalaActual = cilindroHerramienta.localScale;
-                    cilindroHerramienta.localScale = new Vector3(escalaActual.x, escalaY, escalaActual.z);
-
-                    Debug.Log($"[ÉXITO] Cilindro herramienta ajustado a: {tornilloTotalSeguro * 1000f:F1} mm");
-                }
-                else
-                {
-                    Debug.LogWarning("Falta asignar 'cilindroHerramienta' en el Inspector para poder cambiar su tamaño.");
-                }
+                
             }
         }
         else
@@ -218,6 +218,7 @@ public class GeneradorTriangulo : MonoBehaviour
 
         //float distanciaMinimaPermitida = 0.005f; // 5 mm de seguridad
         float maximaViolacion = 0f; // Guardará cuánto nos hemos pasado del límite
+        float distanciaMinima = float.MaxValue;
 
         for (float offsetY = inicio; offsetY <= fin; offsetY += paso)
         {
@@ -236,12 +237,15 @@ public class GeneradorTriangulo : MonoBehaviour
                 Debug.DrawRay(hit.point, Vector3.right * tamañoCruz, Color.red, duracionLinea);
                 Debug.DrawRay(hit.point, Vector3.left * tamañoCruz, Color.red, duracionLinea);
 
+                if (hit.distance < distanciaMinima)
+                {
+                    distanciaMinima = hit.distance;
+                }
                 // Calculamos si este rayo está a menos de 5 mm de la pared
                 if (hit.distance < distanciaMinimaPermitida)
                 {
                     // Cuánto nos falta para llegar a los 5 mm de seguridad
                     float violacion = distanciaMinimaPermitida - hit.distance;
-
                     // Nos quedamos con la corrección más grande de todo el cilindro
                     if (violacion > maximaViolacion)
                     {
@@ -254,7 +258,11 @@ public class GeneradorTriangulo : MonoBehaviour
                 Debug.DrawLine(origenNivel, finDelLaser, Color.yellow, duracionLinea);
             }
         }
-
+        // Guardamos la distancia mínima en la variable estática correcta
+        if (tornilloRef.name == "Tornillo_Superior_Izquierdo")
+            distanciaParedIzq = distanciaMinima;
+        else if (tornilloRef.name == "Tornillo_Superior_Derecho")
+            distanciaParedDer = distanciaMinima;
         // --- REPOSICIONAMIENTO AUTOMÁTICO (CONSTRAINT SOLVER) ---
         if (maximaViolacion > 0f)
         {
