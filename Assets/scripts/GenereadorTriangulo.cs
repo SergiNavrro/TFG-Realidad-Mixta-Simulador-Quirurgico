@@ -4,52 +4,52 @@ using UnityEngine.InputSystem.HID;
 
 public class GeneradorTriangulo : MonoBehaviour
 {
-    [Header("ConfiguraciÛn del Tri·ngulo")]
+    [Header("Configuraci√≥n del Tri√°ngulo")]
     public GameObject prefabTornillo;
     public Transform huesoContenedor;
 
-    [Header("Control de SeparaciÛn (Slider)")]
-    [Tooltip("SeparaciÛn actual en metros")]
+    [Header("Control de Separaci√≥n (Slider)")]
+    [Tooltip("Separaci√≥n actual en metros")]
     public float separacion = 0.015f; // Por defecto 15mm
     public float separacionMinima = 0.005f; // 5mm
     public float separacionMaxima = 0.030f; // 30mm
 
-    [Header("Ajuste de ProporciÛn")]
+    [Header("Ajuste de Proporci√≥n")]
     [Tooltip("La escala X original del tornillo de tu Prefab (ej: 0.007)")]
     public float escalaOriginalX = 0.007f;
     [Header("Referencia de la Herramienta")]
-    public Transform cilindroHerramienta; // Arrastra aquÌ el cilindro que sigue al ArUco
+    public Transform cilindroHerramienta; // Arrastra aqu√≠ el cilindro que sigue al ArUco
     public enum EjeHueso { X_Right, Y_Up, Z_Forward, MenosX_Left, MenosY_Down, MenosZ_Back }
 
     [Header("Ajuste de Ejes")]
     public EjeHueso ejeParaSubir = EjeHueso.Z_Forward;
-    [Header("Ajuste de L·seres")]
-    public float alcanceDelRayo = 2.0f; // Pon aquÌ 5, 10 o lo que necesites en el Inspector
+    [Header("Ajuste de L√°seres")]
+    public float alcanceDelRayo = 2.0f; // Pon aqu√≠ 5, 10 o lo que necesites en el Inspector
     [Header("Interfaz UI")]
-    [Tooltip("Arrastra aquÌ el PinchSlider desde el Inspector")]
+    [Tooltip("Arrastra aqu√≠ el PinchSlider desde el Inspector")]
     public PinchSlider sliderUI;
 
-    // AÒade esto junto a las otras variables privadas
+    // A√±ade esto junto a las otras variables privadas
     [HideInInspector] public static float profundidadCalculada = 0f;
     [HideInInspector] public static float distanciaParedIzq = 0f;
     [HideInInspector] public static float distanciaParedDer = 0f;
     [HideInInspector] public static float separacionFinal = 0f;
 
-    // Cerrojo de seguridad para evitar bucles infinitos al mover el slider por cÛdigo
+    // Cerrojo de seguridad para evitar bucles infinitos al mover el slider por c√≥digo
     private bool actualizandoSliderManual = false;
 
-    // Guardamos las referencias de los tornillos para poder moverlos despuÈs de crearlos
+    // Guardamos las referencias de los tornillos para poder moverlos despu√©s de crearlos
     private GameObject tornilloIzqGenerado;
     private GameObject tornilloDerGenerado;
-    // Guardar· la separaciÛn m·xima permitida en el momento en que se crean los tornillos
+    // Guardar√° la separaci√≥n m√°xima permitida en el momento en que se crean los tornillos
     private float limiteSeparacionFijo = 0.030f;
-    // BOT”N: Crea los tornillos si no existen y los coloca
+    // BOT√ìN: Crea los tornillos si no existen y los coloca
     public void GenerarSuperiores()
     {
         GameObject guia = GameObject.Find("Tornillo_Manual");
         if (guia == null)
         {
-            Debug.LogWarning("°Falta el tornillo guÌa!");
+            Debug.LogWarning("¬°Falta el tornillo gu√≠a!");
             return;
         }
 
@@ -72,8 +72,8 @@ public class GeneradorTriangulo : MonoBehaviour
             ApagarAgarre(tornilloDerGenerado);
         }
 
-        // Calculamos y aplicamos la posiciÛn exacta
-        // Calculamos y aplicamos la posiciÛn exacta (y los l·seres los empujan si chocan)
+        // Calculamos y aplicamos la posici√≥n exacta
+        // Calculamos y aplicamos la posici√≥n exacta (y los l√°seres los empujan si chocan)
         RecalcularPosiciones();
 
         // --- NUEVO: ESTABLECER EL BLOQUE ---
@@ -81,25 +81,25 @@ public class GeneradorTriangulo : MonoBehaviour
         float distanciaReal = Vector3.Distance(tornilloIzqGenerado.transform.position, tornilloDerGenerado.transform.position);
         float factorDeProporcion = guia.transform.lossyScale.x / escalaOriginalX;
 
-        // Guardamos esta distancia como el tope m·ximo inamovible
+        // Guardamos esta distancia como el tope m√°ximo inamovible
         limiteSeparacionFijo = distanciaReal / factorDeProporcion;
         separacionFinal = separacion;
     }
 
-    // SLIDER MRTK: Este es el mÈtodo que tienes que enlazar en el PinchSlider de MRTK
+    // SLIDER MRTK: Este es el m√©todo que tienes que enlazar en el PinchSlider de MRTK
     public void AlMoverSliderMRTK(SliderEventData eventData)
     {
         // 1. Calculamos lo que el usuario QUIERE hacer
         float separacionDeseada = Mathf.Lerp(separacionMinima, separacionMaxima, eventData.NewValue);
 
-        // 2. Si intenta abrirlo m·s del tope inicial, lo bloqueamos en ese tope
+        // 2. Si intenta abrirlo m√°s del tope inicial, lo bloqueamos en ese tope
         if (separacionDeseada > limiteSeparacionFijo)
         {
             separacion = limiteSeparacionFijo;
         }
         else
         {
-            // Si lo est· haciendo m·s pequeÒo (cerrando el tri·ngulo), le dejamos
+            // Si lo est√° haciendo m√°s peque√±o (cerrando el tri√°ngulo), le dejamos
             separacion = separacionDeseada;
         }
         separacionFinal = separacion;
@@ -109,7 +109,7 @@ public class GeneradorTriangulo : MonoBehaviour
             RecalcularPosiciones();
         }
     }
-    // FunciÛn temporal para visualizar los rayos radiales del tornillo
+    // Funci√≥n temporal para visualizar los rayos radiales del tornillo
     // Ahora recibe directamente el vector de desplazamiento
 
     private void LanzarLaseresProfundida(Transform tornilloRef)
@@ -125,7 +125,6 @@ public class GeneradorTriangulo : MonoBehaviour
 
         // 1. EL RAYO DE ENTRADA (Hacia adelante)
         RaycastHit hitEntrada;
-        // Solo necesitamos el Raycast normal, el primero que toque ser· la cortical lateral
         bool tocoEntrada = Physics.Raycast(puntoBase, tornilloRef.up, out hitEntrada, 2.0f, mascaraHueso);
 
         if (tocoEntrada)
@@ -134,64 +133,56 @@ public class GeneradorTriangulo : MonoBehaviour
             Vector3 puntoLejano = puntoBase + (tornilloRef.up * 2.0f);
 
             RaycastHit hitSalida;
-            // Rayo hacia atr·s
             bool tocoSalida = Physics.Raycast(puntoLejano, -tornilloRef.up, out hitSalida, 2.0f, mascaraHueso);
 
             if (tocoSalida)
             {
-                // --- EL C¡LCULO CLÕNICO ---
+                // --- EL CALCULO CLINICO ---
                 float distanciaEntrada = Vector3.Distance(puntoBase, hitEntrada.point);
                 float distanciaSalida = Vector3.Distance(puntoBase, hitSalida.point);
 
-                // El grosor total del hueso de pared a pared
+                // Grosor real del hueso de pared a pared
                 float huesoTotal = distanciaSalida - distanciaEntrada;
 
-                // --- NUEVO: APLICACI”N DEL MARGEN DE SEGURIDAD ---
-                //float margenSeguridad = 0.015f; // 1.5 cm de margen de seguridad
-
-                // Lo que realmente va a morder el tornillo dentro del hueso sin llegar al final
+                // Longitud de tornillo anclada en hueso, parada 15 mm antes del fondo.
+                // ESTA es la profundidad optima de insercion (lo que se reporta).
                 float longitudAncladaSegura = huesoTotal - margenSeguridad;
 
-                // Donde ya tienes esto:
+                // Longitud TOTAL del cilindro virtual desde su base (incluye el tramo base->hueso).
+                // Solo se usa para escalar el cilindro, NO se reporta.
                 float tornilloTotalSeguro = distanciaEntrada + longitudAncladaSegura;
-                profundidadCalculada = tornilloTotalSeguro;
 
-                // AÒade esto justo debajo: cilindro herramienta
+                // CORREGIDO: guardamos la profundidad clinica (en hueso), no la del cilindro
+                profundidadCalculada = longitudAncladaSegura;
+
+                // Escalado del cilindro herramienta (sigue usando la longitud total desde la base)
                 if (cilindroHerramienta != null)
                 {
-                    // 1. Guardamos la punta ANTES de escalar
                     float escalaYAnterior = cilindroHerramienta.localScale.y;
                     float nuevaEscalaY = (tornilloTotalSeguro / factorEscala) / 2f;
 
                     Vector3 puntaAntes = cilindroHerramienta.position -
                                          (cilindroHerramienta.up * (escalaYAnterior * 2f / 2f));
 
-                    // 2. Escalamos
                     cilindroHerramienta.localScale = new Vector3(
                         cilindroHerramienta.localScale.x,
                         nuevaEscalaY,
                         cilindroHerramienta.localScale.z
                     );
 
-                    // 3. Calculamos dÛnde ha quedado la punta despuÈs
                     Vector3 puntaDespues = cilindroHerramienta.position -
                                            (cilindroHerramienta.up * (nuevaEscalaY * 2f / 2f));
 
-                    // 4. Compensamos para que la punta quede fija
                     cilindroHerramienta.position -= (puntaAntes - puntaDespues);
 
-                    Debug.Log($"Cilindro ajustado a: {tornilloTotalSeguro * 1000f:F1} mm");
+                    Debug.Log($"Cilindro (base->punta): {tornilloTotalSeguro * 1000f:F1} mm");
                 }
 
-                // Imprimimos la ficha clÌnica
-                Debug.Log($"--- REPORTE CLÕNICO: {tornilloRef.name} ---");
+                // Ficha clinica por consola
+                Debug.Log($"--- REPORTE CLINICO: {tornilloRef.name} ---");
                 Debug.Log($"1. Hueco (Base -> Entrada): {distanciaEntrada * 1000f:F1} mm");
                 Debug.Log($"2. Grosor total del hueso: {huesoTotal * 1000f:F1} mm");
-                Debug.Log($"3. Longitud de tornillo SEGURA (-15mm): {tornilloTotalSeguro * 1000f:F1} mm");
-
-                // --- NUEVO: REESCALADO DE LA HERRAMIENTA ---
-                // Si hemos enlazado el cilindro de la herramienta en el Inspector, le cambiamos el tamaÒo
-                
+                Debug.Log($"3. PROFUNDIDAD OPTIMA (anclada en hueso, -15mm): {longitudAncladaSegura * 1000f:F1} mm");
             }
         }
         else
@@ -199,7 +190,7 @@ public class GeneradorTriangulo : MonoBehaviour
             Debug.LogWarning($"El rayo de {tornilloRef.name} no ha tocado el hueso.");
         }
     }
-    private void DispararL·seresVisuales(Transform tornilloRef, Vector3 direccionDesplazamiento)
+    private void DispararL√°seresVisuales(Transform tornilloRef, Vector3 direccionDesplazamiento)
     {
         Physics.queriesHitBackfaces = true;
         int mascaraHueso = LayerMask.GetMask("Hueso");
@@ -216,8 +207,7 @@ public class GeneradorTriangulo : MonoBehaviour
 
         Vector3 direccionRadial = direccionDesplazamiento.normalized;
 
-        //float distanciaMinimaPermitida = 0.005f; // 5 mm de seguridad
-        float maximaViolacion = 0f; // Guardar· cu·nto nos hemos pasado del lÌmite
+        float maximaViolacion = 0f;
         float distanciaMinima = float.MaxValue;
 
         for (float offsetY = inicio; offsetY <= fin; offsetY += paso)
@@ -231,22 +221,19 @@ public class GeneradorTriangulo : MonoBehaviour
             {
                 Debug.DrawLine(origenNivel, finDelLaser, Color.green, duracionLinea);
 
-                float tamaÒoCruz = 0.002f;
-                Debug.DrawRay(hit.point, Vector3.up * tamaÒoCruz, Color.red, duracionLinea);
-                Debug.DrawRay(hit.point, Vector3.down * tamaÒoCruz, Color.red, duracionLinea);
-                Debug.DrawRay(hit.point, Vector3.right * tamaÒoCruz, Color.red, duracionLinea);
-                Debug.DrawRay(hit.point, Vector3.left * tamaÒoCruz, Color.red, duracionLinea);
+                float tama√±oCruz = 0.002f;
+                Debug.DrawRay(hit.point, Vector3.up * tama√±oCruz, Color.red, duracionLinea);
+                Debug.DrawRay(hit.point, Vector3.down * tama√±oCruz, Color.red, duracionLinea);
+                Debug.DrawRay(hit.point, Vector3.right * tama√±oCruz, Color.red, duracionLinea);
+                Debug.DrawRay(hit.point, Vector3.left * tama√±oCruz, Color.red, duracionLinea);
 
                 if (hit.distance < distanciaMinima)
                 {
                     distanciaMinima = hit.distance;
                 }
-                // Calculamos si este rayo est· a menos de 5 mm de la pared
                 if (hit.distance < distanciaMinimaPermitida)
                 {
-                    // Cu·nto nos falta para llegar a los 5 mm de seguridad
                     float violacion = distanciaMinimaPermitida - hit.distance;
-                    // Nos quedamos con la correcciÛn m·s grande de todo el cilindro
                     if (violacion > maximaViolacion)
                     {
                         maximaViolacion = violacion;
@@ -258,23 +245,34 @@ public class GeneradorTriangulo : MonoBehaviour
                 Debug.DrawLine(origenNivel, finDelLaser, Color.yellow, duracionLinea);
             }
         }
-        // Guardamos la distancia mÌnima en la variable est·tica correcta
+
         if (tornilloRef.name == "Tornillo_Superior_Izquierdo")
             distanciaParedIzq = distanciaMinima;
         else if (tornilloRef.name == "Tornillo_Superior_Derecho")
             distanciaParedDer = distanciaMinima;
-        // --- REPOSICIONAMIENTO AUTOM¡TICO (CONSTRAINT SOLVER) ---
+
+        // --- REPORTE POR PANTALLA (distancia a la pared) ---
+        Debug.Log($"--- PARED: {tornilloRef.name} ---");
+        if (distanciaMinima < float.MaxValue)
+            Debug.Log($"Distancia minima a la pared: {distanciaMinima * 1000f:F1} mm " +
+                      $"(margen minimo: {distanciaMinimaPermitida * 1000f:F1} mm)");
+        else
+            Debug.LogWarning("Ningun laser toco la pared (el tornillo esta fuera del alcance del rayo).");
+
+        // --- REPOSICIONAMIENTO AUTOMATICO (CONSTRAINT SOLVER) ---
         if (maximaViolacion > 0f)
         {
-            // Movemos el tornillo hacia atr·s (restando la direcciÛn) exactamente la distancia necesaria
             tornilloRef.position -= direccionRadial * maximaViolacion;
-
-            // Imprimimos el ajuste por consola para verificar
-            Debug.Log($"Reposicionado {tornilloRef.name}: empujado {maximaViolacion * 1000f:F1} mm hacia el centro por seguridad.");
+            Debug.Log($"CORRECCION: {tornilloRef.name} empujado {maximaViolacion * 1000f:F1} mm " +
+                      $"hacia el centro por seguridad.");
+        }
+        else
+        {
+            Debug.Log($"{tornilloRef.name}: sin correccion (distancia segura).");
         }
     }
 
-    // Toda tu matem·tica perfecta de antes, ahora en su propia funciÛn
+    // Toda tu matem√°tica perfecta de antes, ahora en su propia funci√≥n
     private void RecalcularPosiciones()
     {
         GameObject guia = GameObject.Find("Tornillo_Manual");
@@ -284,11 +282,11 @@ public class GeneradorTriangulo : MonoBehaviour
         float factorDeProporcion = guia.transform.lossyScale.x / escalaOriginalX;
         float ladoTriangulo = separacion * factorDeProporcion;
 
-        // 2. MATEM¡TICA DEL TRI¡NGULO EQUIL¡TERO PERFECTO
+        // 2. MATEM√ÅTICA DEL TRI√ÅNGULO EQUIL√ÅTERO PERFECTO
         float alturaTriangulo = ladoTriangulo * (Mathf.Sqrt(3) / 2f);
         float mitadBase = ladoTriangulo / 2f;
 
-        // 3. LA MAGIA: EL NIVEL DE ALBA—IL
+        // 3. LA MAGIA: EL NIVEL DE ALBA√ëIL
         Vector3 ejeSubirHueso = ObtenerVectorEje(ejeParaSubir);
         Vector3 ejeTornillo = guia.transform.up;
 
@@ -306,14 +304,14 @@ public class GeneradorTriangulo : MonoBehaviour
         tornilloDerGenerado.transform.position = centroDer;
         tornilloDerGenerado.transform.rotation = guia.transform.rotation;
 
-        // --- NUEVO: C¡LCULO INFALIBLE DE DIRECCI”N ---
-        // Calculamos el vector exacto restando la posiciÛn de destino menos la de origen (el centro)
-        // Esto crea una flecha que apunta estrictamente hacia afuera en la direcciÛn que se han movido.
+        // --- NUEVO: C√ÅLCULO INFALIBLE DE DIRECCI√ìN ---
+        // Calculamos el vector exacto restando la posici√≥n de destino menos la de origen (el centro)
+        // Esto crea una flecha que apunta estrictamente hacia afuera en la direcci√≥n que se han movido.
         Vector3 direccionAfueraIzq = (tornilloIzqGenerado.transform.position - guia.transform.position).normalized;
         Vector3 direccionAfueraDer = (tornilloDerGenerado.transform.position - guia.transform.position).normalized;
 
-        DispararL·seresVisuales(tornilloIzqGenerado.transform, direccionAfueraIzq);
-        DispararL·seresVisuales(tornilloDerGenerado.transform, direccionAfueraDer);
+        DispararL√°seresVisuales(tornilloIzqGenerado.transform, direccionAfueraIzq);
+        DispararL√°seresVisuales(tornilloDerGenerado.transform, direccionAfueraDer);
         LanzarLaseresProfundida(guia.transform);
 
     }
