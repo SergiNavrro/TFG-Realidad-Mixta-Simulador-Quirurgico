@@ -21,4 +21,4 @@ Autor: Sergi Navarro
 
 ## Vídeo de demostración
 
-[Ver demostración del sistema completo]([https://www.youtube.com/watch?v=XXXXXXX](https://www.youtube.com/watch?v=qpwyrqIn6Bw))
+[Ver demostración del sistema completo]([[https://www.youtube.com/watch?v=qpwyrqIn6Bw](https://www.youtube.com/watch?v=qpwyrqIn6Bw)](https://www.youtube.com/watch?v=qpwyrqIn6Bw))
